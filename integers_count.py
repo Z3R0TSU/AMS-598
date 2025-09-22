@@ -3,12 +3,8 @@ import sys
 from collections import defaultdict
 
 def mapper(file_id, tmp_dir, data_dir):
-    """
-    Counts integers (0-100) in a specific file and saves the results.
-    """
     file_number = int(file_id) + 1
-    # File naming for HPC environment
-    input_file = os.path.join(data_dir, f"project1_data_{file_number}.txt")
+    input_file = os.path.join(data_dir, f"project1_data_{file_number}.txt") 
     output_file = os.path.join(tmp_dir, f"mapper_output_{file_id}.txt")
 
     if not os.path.exists(input_file):
@@ -17,7 +13,6 @@ def mapper(file_id, tmp_dir, data_dir):
 
     counts = defaultdict(int)
 
-    # Read the file and count integers
     try:
         with open(input_file, 'r') as f:
             for line in f:
@@ -30,7 +25,6 @@ def mapper(file_id, tmp_dir, data_dir):
         print(f"Error reading {input_file}: {e}", file=sys.stderr)
         return
 
-    # Write the counts to the output file
     with open(output_file, 'w') as f:
         for num, count in counts.items():
             f.write(f"{num}\t{count}\n")
@@ -38,12 +32,8 @@ def mapper(file_id, tmp_dir, data_dir):
     print(f"Mapper {file_id} finished. Results saved to {output_file}")
 
 def reducer(tmp_dir):
-    """
-    Combines counts from all mapper output files and shows the top 6 integers.
-    """
     total_counts = defaultdict(int)
 
-    # Read all mapper output files
     for file_name in os.listdir(tmp_dir):
         if file_name.startswith("mapper_output_"):
             file_path = os.path.join(tmp_dir, file_name)
@@ -55,7 +45,6 @@ def reducer(tmp_dir):
             except Exception as e:
                 print(f"Error reading {file_path}: {e}", file=sys.stderr)
 
-    # Find the top 6 integers
     top_six = sorted(total_counts.items(), key=lambda x: x[1], reverse=True)[:6]
 
     print("Top 6 integers:")

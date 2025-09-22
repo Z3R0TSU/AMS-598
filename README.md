@@ -14,15 +14,18 @@ This project implements a MapReduce solution to count integers (0-100) across mu
 
 1. **Update your NetID** in the SLURM scripts:
    ```bash
-   # Change this line in all three files:
+   # Change this line in all three scripts:
    NETID="SMARUPUDI"  # Replace with your actual NetID
    ```
 
-2. **Submit the jobs**:
+2. **Submit the jobs** on the HPC cluster:
    ```bash
    chmod +x submit_all.sh
    ./submit_all.sh
    ```
+
+   This will process files named `project1_data_1.txt` through `project1_data_4.txt` in the directory:
+   `/gpfs/projects/AMS598/projects2025_data/project1_data`
 
 That's it! The script handles dependencies automatically.
 
