@@ -80,14 +80,14 @@ def reducer(tmp_dir):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python count_integers.py <mode> [args...]")
+        print("Usage: python integers_count.py <mode> [args...]")
         sys.exit(1)
 
     mode = sys.argv[1]
     
     if mode == "mapper":
         if len(sys.argv) != 5:
-            print("Usage: python count_integers.py mapper <file_id> <tmp_dir> <data_dir>")
+            print("Usage: python integers_count.py mapper <file_id> <tmp_dir> <data_dir>")
             sys.exit(1)
         file_id = sys.argv[2]
         tmp_dir = sys.argv[3]
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         
     elif mode == "reducer":
         if len(sys.argv) != 3:
-            print("Usage: python count_integers.py reducer <tmp_dir>")
+            print("Usage: python integers_count.py reducer <tmp_dir>")
             sys.exit(1)
         tmp_dir = sys.argv[2]
         reducer(tmp_dir)

@@ -39,6 +39,11 @@ ENV/
 *.tmp
 *.temp
 
+# Local testing files (not part of assignment)
+local_test/
+test_local.*
+data/
+
 # OS generated files
 .DS_Store
 .DS_Store?
