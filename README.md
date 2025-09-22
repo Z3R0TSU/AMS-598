@@ -1,69 +1,70 @@
-# AMS 598 Project 1: Integer Count MapReduce
+# AMS 598 Project 1: Integer Count with MapReduce
 
-A MapReduce implementation for counting integers in the range 0-100 from multiple data files using SLURM job arrays.
+This project implements a MapReduce solution to count integers (0-100) across multiple data files. It uses SLURM job arrays to run 4 mapper processes in parallel, followed by a single reducer that aggregates the results.
 
-## Usage
+## What's in this repo
 
-### Quick Start
+- `integers_count.py` - Main Python script with mapper and reducer functions
+- `submit_mappers.slurm` - SLURM script to run 4 mapper jobs in parallel
+- `submit_reducer.slurm` - SLURM script for the reducer (waits for mappers to finish)
+- `submit_all.sh` - Convenience script to submit everything at once
+- `data/` - Sample data files for local testing
+
+## Quick Setup
+
+1. **Update your NetID** in the SLURM scripts:
+   ```bash
+   # Change this line in all three files:
+   NETID="SMARUPUDI"  # Replace with your actual NetID
+   ```
+
+2. **Submit the jobs**:
+   ```bash
+   chmod +x submit_all.sh
+   ./submit_all.sh
+   ```
+
+That's it! The script handles dependencies automatically.
+
+## How it works
+
+### Mapper Phase (4 parallel jobs)
+Each mapper processes one data file and counts integers 0-100:
+- Mapper 0 → `project1_data_1.txt`
+- Mapper 1 → `project1_data_2.txt`
+- Mapper 2 → `project1_data_3.txt`
+- Mapper 3 → `project1_data_4.txt`
+
+Results are saved as tab-separated files in `/gpfs/projects/AMS598/class2025/YourNetID/intermediate_files/`
+
+### Reducer Phase (1 job)
+Waits for all mappers to complete, then:
+- Reads all intermediate files
+- Combines the counts
+- Reports the top 6 most frequent integers
+
+## Manual submission (if needed)
+
 ```bash
-# Make the master script executable
-chmod +x submit_all.sh
-
-# Submit both mapper and reducer jobs with proper dependencies
-./submit_all.sh
-```
-
-### Manual Submission
-```bash
-# Submit mapper jobs first
+# Submit mappers first
 MAPPER_JOB_ID=$(sbatch --parsable submit_mappers.slurm)
 
-# Submit reducer with dependency on all mappers
+# Submit reducer with dependency
 sbatch --dependency=afterok:${MAPPER_JOB_ID} submit_reducer.slurm
 ```
 
-### Monitoring Jobs
+## Checking job status
+
 ```bash
-# Check job status
+# See all your jobs
 squeue -u $USER
 
-# Check specific jobs
-squeue -j <JOB_ID>
-
-# View output files
+# Check specific job output
 ls -la /gpfs/projects/AMS598/class2025/YourNetID/slurm_output/
 ```
 
-## Configuration
+## Notes
 
-**Important**: Update the `NETID` variable in all SLURM scripts:
-- `submit_mappers.slurm`
-- `submit_reducer.slurm` 
-- `submit_all.sh`
-
-Change `NETID="SMARUPUDI"` to your actual NetID.
-
-## How It Works
-
-1. **Mapper Phase**: 4 parallel processes (array job 0-3) each process one data file
-   - Maps array index to file: 0→data1, 1→data2, 2→data3, 3→data4
-   - Counts integers 0-100 in assigned file
-   - Saves results to intermediate files
-
-2. **Reducer Phase**: Single process that waits for all mappers
-   - Aggregates all mapper outputs
-   - Reports top 6 integers by frequency
-   - Archives intermediate files for verification
-
-## File Processing
-
-- Processes files: `project1_data_1.txt` through `project1_data_4.txt`
-- Output files: `/gpfs/projects/AMS598/class2025/YourNetID/intermediate_files/mapper_output_X.txt`
-- Final results: Printed to reducer output file
-
-## Error Handling
-
-- Validates input files exist before processing
-- Handles malformed data gracefully
-- Archives intermediate files instead of deleting for debugging
-- Comprehensive logging in SLURM output files
+- The intermediate files are kept for debugging (not deleted automatically)
+- Make sure to update your NetID before submitting!
+- If jobs fail, check the `.out` and `.err` files in your slurm_output directory
