@@ -2,26 +2,6 @@
 
 A MapReduce implementation for counting integers in the range 0-100 from multiple data files using SLURM job arrays.
 
-## Project Structure
-
-```
-├── integers_count.py          # Main Python script with mapper() and reducer() functions
-├── submit_mappers.slurm       # SLURM script for mapper jobs (array job with 4 processes)
-├── submit_reducer.slurm       # SLURM script for reducer job
-├── submit_all.sh             # Master script to coordinate job submission
-├── data/                     # Local test data files
-└── README.md                 # This file
-```
-
-## Requirements Met
-
-1. ✅ **Single script file**: `integers_count.py` contains all logic
-2. ✅ **Mapper and reducer functions**: Both implemented as separate functions
-3. ✅ **Results saved to disk**: Mapper outputs saved to intermediate files
-4. ✅ **Synchronization**: Reducer waits for all mappers to complete using SLURM dependencies
-5. ✅ **4 processes**: Uses SLURM array job with indices 0-3 for mappers
-6. ✅ **Proper directories**: Uses `/gpfs/projects/AMS598/class2025/YourNetID/` structure
-
 ## Usage
 
 ### Quick Start
