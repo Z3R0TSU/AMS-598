@@ -38,6 +38,7 @@ ENV/
 # Temporary files
 *.tmp
 *.temp
+tmp/
 
 # Local testing files (not part of assignment)
 local_test/
