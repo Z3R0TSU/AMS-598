@@ -3,12 +3,16 @@
 #SBATCH --time=00:10:00
 #SBATCH --partition=short-40core
 #SBATCH --job-name=Integer_Reducer
-#SBATCH --output=reducer_%j.out
-#SBATCH --error=reducer_%j.err
+# Note: When submitting, use --dependency=afterok:MAPPER_JOB_ID
+#SBATCH --output=/gpfs/projects/AMS598/class2025/SMARUPUDI/slurm_output/reducer_%j.out
+#SBATCH -e stderr.txt
+#SBATCH -o stdout.txt
 #SBATCH --open-mode=append
 
+# Load required modules
 module load anaconda/3
 
+# IMPORTANT: Replace NETID with your own NetID before submitting
 NETID="SMARUPUDI" 
 BASE_DIR="/gpfs/projects/AMS598/class2025/${NETID}"
 TMP_DIR="${BASE_DIR}/intermediate_files"

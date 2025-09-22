@@ -2,6 +2,9 @@
 import sys
 from collections import defaultdict
 
+# MapReduce implementation for counting integers in files
+# Used with SLURM job arrays for parallel processing
+
 def mapper(file_id, tmp_dir, data_dir):
     file_number = int(file_id) + 1
     input_file = os.path.join(data_dir, f"project1_data_{file_number}.txt") 

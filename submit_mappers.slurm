@@ -4,12 +4,15 @@
 #SBATCH --partition=short-40core
 #SBATCH --job-name=Integer_Mapper
 #SBATCH --array=0-3
-#SBATCH --output=mapper_%A_%a.out
-#SBATCH --error=mapper_%A_%a.err
+#SBATCH --output=/gpfs/projects/AMS598/class2025/SMARUPUDI/slurm_output/mapper_%A_%a.out
+#SBATCH -e stderr.txt
+#SBATCH -o stdout.txt
 #SBATCH --open-mode=append
 
+# Load required modules
 module load anaconda/3
 
+# IMPORTANT: Replace NETID with your own NetID before submitting
 NETID="SMARUPUDI"  
 BASE_DIR="/gpfs/projects/AMS598/class2025/${NETID}"
 TMP_DIR="${BASE_DIR}/intermediate_files"
