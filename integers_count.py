@@ -7,7 +7,8 @@ def mapper(file_id, tmp_dir, data_dir):
     Counts integers (0-100) in a specific file and saves the results.
     """
     file_number = int(file_id) + 1
-    input_file = os.path.join(data_dir, f"data{file_number}.txt")
+    # File naming for HPC environment
+    input_file = os.path.join(data_dir, f"project1_data_{file_number}.txt")
     output_file = os.path.join(tmp_dir, f"mapper_output_{file_id}.txt")
 
     if not os.path.exists(input_file):
