@@ -1,78 +1,79 @@
-﻿import os
+import os
 import sys
 from collections import defaultdict
+from multiprocessing import Pool
 
-# MapReduce implementation for counting integers in files
-# Used with SLURM job arrays for parallel processing
 
-def mapper(file_id, tmp_dir, data_dir):
-    file_number = int(file_id) + 1
-    input_file = os.path.join(data_dir, f"project1_data_{file_number}.txt") 
-    output_file = os.path.join(tmp_dir, f"mapper_output_{file_id}.txt")
-
-    if not os.path.exists(input_file):
-        print(f"Error: {input_file} not found.", file=sys.stderr)
-        return
-
+def mapper_worker(args):
+    input_file, tmp_dir = args
+    file_name = os.path.basename(input_file)
+    output_file = os.path.join(tmp_dir, f"mapper_output_{file_name}.txt")
     counts = defaultdict(int)
-
     try:
-        with open(input_file, 'r') as f:
+        with open(input_file, "r") as f:
             for line in f:
-                for num in line.split():
+                for num in line.strip().split():
                     if num.isdigit():
-                        num = int(num)
-                        if 0 <= num <= 100:
-                            counts[num] += 1
+                        val = int(num)
+                        if 0 <= val <= 100:
+                            counts[val] += 1
     except Exception as e:
         print(f"Error reading {input_file}: {e}", file=sys.stderr)
         return
+    try:
+        with open(output_file, "w") as f:
+            for num, count in counts.items():
+                f.write(f"{num}\t{count}\n")
+        print(f"Mapper finished {input_file} → {output_file}")
+    except Exception as e:
+        print(f"Error writing {output_file}: {e}", file=sys.stderr)
 
-    with open(output_file, 'w') as f:
-        for num, count in counts.items():
-            f.write(f"{num}\t{count}\n")
 
-    print(f"Mapper {file_id} finished. Results saved to {output_file}")
+def mapper(tmp_dir, data_dir):
+    os.makedirs(tmp_dir, exist_ok=True)
+    files = [os.path.join(data_dir, f) for f in os.listdir(data_dir)]
+    with Pool(processes=4) as pool:
+        pool.map(mapper_worker, [(f, tmp_dir) for f in files])
 
-def reducer(tmp_dir):
+
+def reducer(tmp_dir, output_file="reduce_result.txt"):
     total_counts = defaultdict(int)
-
     for file_name in os.listdir(tmp_dir):
         if file_name.startswith("mapper_output_"):
             file_path = os.path.join(tmp_dir, file_name)
             try:
-                with open(file_path, 'r') as f:
+                with open(file_path, "r") as f:
                     for line in f:
-                        num, count = line.split('\t')
+                        num, count = line.strip().split("\t")
                         total_counts[int(num)] += int(count)
             except Exception as e:
                 print(f"Error reading {file_path}: {e}", file=sys.stderr)
-
     top_six = sorted(total_counts.items(), key=lambda x: x[1], reverse=True)[:6]
+    output_path = os.path.join(tmp_dir, output_file)
+    try:
+        with open(output_path, "w") as f:
+            for num, count in top_six:
+                f.write(f"{num}\t{count}\n")
+        print(f"Reducer finished. Top 6 results saved to {output_file}")
+    except Exception as e:
+        print(f"Error writing {output_file}: {e}", file=sys.stderr)
 
-    print("Top 6 integers:")
-    for num, count in top_six:
-        print(f"{num}: {count}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python integers_count.py <mode> [args...]")
         sys.exit(1)
-
     mode = sys.argv[1]
-
     if mode == "mapper":
-        if len(sys.argv) != 5:
-            print("Usage: python integers_count.py mapper <file_id> <tmp_dir> <data_dir>")
+        if len(sys.argv) != 4:
             sys.exit(1)
-        mapper(sys.argv[2], sys.argv[3], sys.argv[4])
-
+        tmp_dir = sys.argv[2]
+        data_dir = sys.argv[3]
+        mapper(tmp_dir, data_dir)
     elif mode == "reducer":
         if len(sys.argv) != 3:
-            print("Usage: python integers_count.py reducer <tmp_dir>")
             sys.exit(1)
-        reducer(sys.argv[2])
-
+        tmp_dir = sys.argv[2]
+        reducer(tmp_dir)
     else:
-        print(f"Unknown mode: {mode}")
         sys.exit(1)
+
